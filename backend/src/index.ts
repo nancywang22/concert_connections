@@ -5,6 +5,8 @@ import express from "express";
 import cors from "cors";
 import artistRoutes from "./routes/artistRoutes";
 import concertRoutes from "./routes/concertRoutes";
+import postRoutes from "./routes/postRoutes";
+import authRoutes from "./routes/authRoutes";
 import { connectDB } from "./db";
 
 
@@ -16,6 +18,8 @@ app.use(express.json());
 
 app.use("/artists", artistRoutes);
 app.use("/concerts", concertRoutes);
+app.use("/auth", authRoutes);
+app.use("/posts", postRoutes);
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 

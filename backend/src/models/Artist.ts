@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IArtist extends Document {
   name: string;
-  setlistFmId: string;
+  setlistFmId: string; // Unique ID from Setlist.fm API
   createdAt: Date;
 }
 

@@ -1,88 +1,86 @@
 import { Request, Response } from "express";
-import { Concert } from "../models/Concert";
+import Concert from "../models/Concert";
 import { Artist } from "../models/Artist";
+import { AuthRequest } from "../middleware/authMiddleware";
+import { getConcertsForArtist } from "../services/setlistfmService";
 
-// Create a concert (or attach memory if already exists for user)
-export async function logConcertHandler(req: Request, res: Response) {
+
+// Create / log a concert
+export async function logConcertHandler(req: AuthRequest, res: Response) {
+  const { artistId, city, date, setlist } = req.body;
+
+  if (!artistId || !city || !date) {
+    return res.status(400).json({ error: "artistId, city, and date are required" });
+  }
+
   try {
-    const { artistId, date, venue, city, userId, memory, rating, photoUrl } = req.body;
+    const artist = await Artist.findById(artistId);
+    if (!artist) return res.status(404).json({ error: "Artist not found" });
 
-    if (!artistId || !date || !venue || !city || !userId) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    // Check if concert already exists for this artist + date + venue
-    let concert = await Concert.findOne({ artist: artistId, date, venue });
-
-    if (!concert) {
-      // Create new concert
-      concert = new Concert({
-        artist: artistId,
-        date,
-        venue,
-        city,
-        userMemories: [{ userId, memory, rating, photoUrl }],
-      });
-    } else {
-      // Add user memory if not already added by this user
-      const existingMemory = concert.userMemories.find(m => m.userId === userId);
-      if (!existingMemory) {
-        concert.userMemories.push({ userId, memory, rating, photoUrl });
-      }
-    }
+    const concert = new Concert({
+      artist: artist._id,
+      city,
+      date,
+      setlist: setlist || [],
+    });
 
     await concert.save();
 
-    res.json(concert);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// Get concerts for a specific artist
-export async function getArtistConcertsHandler(req: Request, res: Response) {
-  try {
-    const artistId = req.params.artistId;
-    const concerts = await Concert.find({ artist: artistId }).populate("artist");
-    res.json(concerts);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// Get overlaps: concerts attended by multiple users
-export async function getUserOverlapsHandler(req: Request, res: Response) {
-  try {
-    const userId = req.params.userId;
-
-    // Find concerts attended by this user
-    const userConcerts = await Concert.find({ "userMemories.userId": userId });
-
-    const overlaps = [];
-
-    for (const concert of userConcerts) {
-      // Find other users who attended the same concert
-      const otherUsers = concert.userMemories
-        .filter(m => m.userId !== userId)
-        .map(m => m.userId);
-
-      if (otherUsers.length > 0) {
-        overlaps.push({
-          concertId: concert._id,
-          artist: concert.artist,
-          date: concert.date,
-          venue: concert.venue,
-          city: concert.city,
-          otherUsers,
-        });
-      }
+    // Optionally, add this concert to the user's list
+    if (req.userId) {
+      const User = (await import("../models/User")).default;
+      await User.findByIdAndUpdate(req.userId, { $push: { concerts: concert._id } });
     }
 
-    res.json(overlaps);
-  } catch (err: any) {
+    res.json(concert);
+  } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Failed to log concert" });
+  }
+}
+
+
+// Get all concerts for a user
+export async function getUserConcertsHandler(req: AuthRequest, res: Response) {
+  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const User = (await import("../models/User")).default;
+    const user = await User.findById(req.userId).populate({
+      path: "concerts",
+      populate: { path: "artist" },
+    });
+
+    res.json(user?.concerts || []);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to get concerts" });
+  }
+}
+
+
+// Fetch upcoming/past concerts for a specific artist from Setlist.fm
+export async function getConcertsForArtistHandler(req: Request, res: Response) {
+  const { setlistFmId } = req.params;
+
+  if (!setlistFmId) {
+    return res.status(400).json({ error: "setlistFmId is required" });
+  }
+
+  try {
+    const concerts = await getConcertsForArtist(setlistFmId);
+    // Simplify the data sent to frontend
+    const formatted = concerts.map((c: any) => ({
+      id: c.id || c["@id"], // Setlist.fm ID
+      venue: c.venue?.name,
+      city: c.venue?.city?.name,
+      date: c.eventDate,
+      songs: c.sets?.set?.flatMap((s: any) => s.song?.map((song: any) => song.name)) || [],
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch concerts for artist" });
   }
 }

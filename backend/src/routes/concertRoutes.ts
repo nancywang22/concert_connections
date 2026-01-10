@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { logConcertHandler, getArtistConcertsHandler, getUserOverlapsHandler } from "../controllers/concertController";
+import {
+  logConcertHandler,
+  getUserConcertsHandler,
+} from "../controllers/concertController";
+import { getConcertsForArtistHandler } from "../controllers/concertController";
+
+import { requireAuth } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Log a concert or add memory
-router.post("/log", logConcertHandler);
-
-// Get all concerts for an artist
-router.get("/artist/:artistId", getArtistConcertsHandler);
-
-// Get overlaps for a user
-router.get("/overlaps/:userId", getUserOverlapsHandler);
-
+router.post("/", requireAuth, logConcertHandler);
+router.get("/my", requireAuth, getUserConcertsHandler);
+router.get("/artist/:setlistFmId", getConcertsForArtistHandler);
 export default router;
