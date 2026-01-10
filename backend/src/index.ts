@@ -1,26 +1,23 @@
-import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
-
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 4000;
+import express from "express";
+import cors from "cors";
+import artistRoutes from "./routes/artistRoutes";
+import concertRoutes from "./routes/concertRoutes";
+import { connectDB } from "./db";
 
-// Middleware
+
+connectDB();
+
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
+app.use("/artists", artistRoutes);
+app.use("/concerts", concertRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
-//entry point of backend
-//sets up middleware
-//proves server runs
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
