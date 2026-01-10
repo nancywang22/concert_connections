@@ -84,3 +84,23 @@ export async function getConcertsForArtistHandler(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to fetch concerts for artist" });
   }
 }
+
+export const searchConcertsHandler = async (req: Request, res: Response) => {
+  const { artistName, city } = req.query;
+
+  if (!artistName || !city) {
+    return res.status(400).json({ error: "artistName and city are required" });
+  }
+
+  try {
+    const concerts = await Concert.find({
+      artistName: artistName.toString(),
+      city: city.toString(),
+    }).sort({ date: 1 }); // sort by date ascending
+
+    res.json(concerts);
+  } catch (err) {
+    console.error("Concert search error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};

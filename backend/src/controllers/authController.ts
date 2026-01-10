@@ -37,5 +37,10 @@ export async function loginHandler(req: Request, res: Response) {
 
   const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
+  
+  console.log("User found:", user);
+    console.log("Password hash:", user?.passwordHash);
+
+
   res.json({ token, user: { id: user._id, username: user.username, email } });
 }

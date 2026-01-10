@@ -1,81 +1,74 @@
-import { useEffect, useState } from "react";
-import { fetchMainPage } from "../services/api";
-import ConcertSelector from "../components/ConcertSelector";
+import React, { useEffect, useState } from "react";
 import SetlistSidebar from "../components/SetlistSidebar";
-import PostFeed from "../components/PostFeed";
-
-interface Artist {
-  name: string;
-  setlistFmId: string;
-}
-
-interface Concert {
-  _id: string;
-  date?: string;
-  city?: string;
-  artist: Artist;
-}
 
 interface Post {
   _id: string;
-  user: { username: string };
-  imageUrl: string;
+  concertName: string;
   caption: string;
-  createdAt: string;
+  imageUrl: string;
+  userName: string;
 }
 
-export default function MainPage() {
-  const [concerts, setConcerts] = useState<Concert[]>([]);
-  const [selectedConcert, setSelectedConcert] = useState<Concert | null>(null);
+const MainPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch data from backend
-  const loadMainPage = async (concertId?: string) => {
-    setLoading(true);
-    const data = await fetchMainPage(concertId);
-    setConcerts(data.concerts || []);
-    setSelectedConcert(data.selectedConcert || null);
-    setPosts(data.posts || []);
-    setLoading(false);
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/posts", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await res.json();
+      setPosts(data);
+    } catch (err) {
+      console.error("Backend fetch error:", err);
+    }
   };
 
   useEffect(() => {
-    loadMainPage();
+    fetchPosts();
   }, []);
 
-  const handleConcertChange = (concertId: string) => {
-    loadMainPage(concertId);
-  };
-
-  if (loading) return <div className="p-4">Loading...</div>;
-
   return (
-    <div className="flex h-screen">
-      {/* Left: Setlist */}
-      <div className="w-1/4 border-r p-4 overflow-y-auto">
-        {selectedConcert ? (
-          <SetlistSidebar concert={selectedConcert} />
-        ) : (
-          <div>Select a concert to see the setlist</div>
-        )}
+    <div className="flex gap-6">
+      {/* LEFT: Setlist */}
+      <div className="w-64">
+        <SetlistSidebar />
       </div>
 
-      {/* Right: Main feed */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        <ConcertSelector
-          concerts={concerts}
-          selectedConcert={selectedConcert}
-          onChange={handleConcertChange}
-        />
-        <PostFeed posts={posts} />
+      {/* RIGHT: Posts (your original code) */}
+      <div className="flex-1 space-y-6">
+        <h1 className="text-2xl font-bold">Concert Posts</h1>
+
+        {posts.length === 0 ? (
+          <p>No posts yet</p>
+        ) : (
+          posts.map((post) => (
+            <div
+              key={post._id}
+              className="border p-4 rounded bg-white shadow"
+            >
+              <h2 className="font-semibold">{post.concertName}</h2>
+              <p>{post.caption}</p>
+
+              {post.imageUrl && (
+                <img
+                  src={post.imageUrl}
+                  alt="concert post"
+                  className="mt-2 rounded max-h-64 w-full object-cover"
+                />
+              )}
+
+              <p className="text-sm text-gray-500 mt-1">
+                by {post.userName}
+              </p>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
-}
+};
 
-/*Fetches all user concerts on load
-
-Updates selected concert and posts when a concert is selected
-
-Uses flex layout: left sidebar for setlist, right for posts */
+export default MainPage;

@@ -2,12 +2,18 @@ import { Router } from "express";
 import {
   createPostHandler,
   getPostsForConcertHandler,
+  getAllPostsHandler,
 } from "../controllers/postController";
-import { requireAuth } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.post("/", requireAuth, createPostHandler);
+// Main feed
+router.get("/", getAllPostsHandler);
+
+// Posts for a specific concert
 router.get("/:concertId", getPostsForConcertHandler);
+
+// Later:
+// router.post("/", requireAuth, createPostHandler);
 
 export default router;

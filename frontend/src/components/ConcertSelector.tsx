@@ -1,43 +1,38 @@
+// src/components/ConcertSelector.tsx
 import React from "react";
 
-interface Artist {
-  name: string;
-  setlistFmId: string;
-}
-
-interface Concert {
+export interface Concert {
   _id: string;
-  date?: string;
-  city?: string;
-  artist: Artist;
+  name: string;
+  date: string;
 }
 
-interface Props {
+interface ConcertSelectorProps {
   concerts: Concert[];
   selectedConcert: Concert | null;
-  onChange: (concertId: string) => void;
+  setSelectedConcert: (concert: Concert) => void;
 }
 
-export default function ConcertSelector({ concerts, selectedConcert, onChange }: Props) {
+export default function ConcertSelector({
+  concerts,
+  selectedConcert,
+  setSelectedConcert,
+}: ConcertSelectorProps) {
   return (
-    <div className="mb-4">
-      <label className="block mb-1 font-semibold">Select Concert:</label>
-      <select
-        className="w-full border rounded p-2"
-        value={selectedConcert?._id || ""}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">-- Select --</option>
-        {concerts.map((concert) => (
-          <option key={concert._id} value={concert._id}>
-            {concert.artist.name} - {concert.city || "Unknown City"} ({concert.date || "Unknown Date"})
-          </option>
-        ))}
-      </select>
+    <div className="space-y-2">
+      <h2 className="font-semibold">Select a Concert</h2>
+      {concerts.length === 0 && <p>No concerts found.</p>}
+      {concerts.map((concert) => (
+        <div
+          key={concert._id}
+          className={`cursor-pointer p-2 border rounded ${
+            selectedConcert?._id === concert._id ? "bg-blue-100" : ""
+          }`}
+          onClick={() => setSelectedConcert(concert)}
+        >
+          {concert.name} - {concert.date}
+        </div>
+      ))}
     </div>
   );
 }
-
-/*Dropdown lets user pick a concert
-
-Calls onChange to reload posts + setlist */

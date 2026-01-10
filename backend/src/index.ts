@@ -27,8 +27,8 @@ app.get("/health", (_req, res) => res.json({ status: "ok" }));
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
-/*
+
 // Minimal test route
 app.get("/ping", (_req, res) => {
   res.json({ message: "pong" });
-});*/
+});

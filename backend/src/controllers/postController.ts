@@ -32,10 +32,28 @@ export async function getPostsForConcertHandler(req: Request, res: Response) {
   if (!concertId) return res.status(400).json({ error: "concertId required" });
 
   try {
-    const posts = await Post.find({ concert: concertId }).populate("user", "username");
+    const posts = await Post.find({ concert: concertId })
+    .populate("user", "username")
+    .populate("concert")
+    .sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to get posts" });
+  }
+}
+
+// Get all posts
+
+export async function getAllPostsHandler(req: Request, res: Response) {
+  try {
+    const posts = await Post.find()
+      .populate("user", "username")
+      .populate("concert")
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch posts" });
   }
 }

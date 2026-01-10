@@ -1,4 +1,4 @@
-import React from "react";
+/*import React from "react";
 
 interface Post {
   _id: string;
@@ -17,4 +17,20 @@ export default function PostCard({ post }: { post: Post }) {
       <small className="text-gray-500">{new Date(post.createdAt).toLocaleString()}</small>
     </div>
   );
+}*/
+
+export default function PostCard({ post }: { post: any }) {
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <img
+        src={post.imageUrl}
+        alt=""
+        style={{ width: "100%", maxHeight: 400, objectFit: "cover" }}
+      />
+      <p>
+        <strong>{post.user?.username}</strong> {post.caption}
+      </p>
+    </div>
+  );
 }
+
