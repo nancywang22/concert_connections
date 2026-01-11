@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PostForm from "../components/PostForm";
-
+const API_URL = "https://concert-connections.onrender.com"; // your backend
 // Artist and Concert interfaces
 interface Artist {
   _id: string;
@@ -32,7 +32,7 @@ const LogConcertPage: React.FC = () => {
   const searchArtists = async () => {
     if (!query) return;
     try {
-      const res = await fetch(`http://localhost:4000/artists/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API_URL}/artists/search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       setArtists(data);
       setSelectedArtist(null);
@@ -51,7 +51,7 @@ const LogConcertPage: React.FC = () => {
     setSelectedConcert(null);
 
     try {
-      const res = await fetch(`http://localhost:4000/artists/${artist._id}/concerts`);
+      const res = await fetch(`${API_URL}/artists/${artist._id}/concerts`);
       const data = await res.json();
 
       // Map concerts to our Concert interface

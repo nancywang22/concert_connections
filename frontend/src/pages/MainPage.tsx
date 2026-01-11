@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+const API_URL = "https://concert-connections.onrender.com"; // your backend
 // Type definitions for Post, Concert, and User
 interface Concert {
   _id: string;
@@ -30,7 +31,7 @@ const MainPage: React.FC = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:4000/posts", {
+      const res = await fetch(`${API_URL}/posts`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

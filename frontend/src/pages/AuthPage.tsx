@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+const API_URL = "https://concert-connections.onrender.com"; // your backend
 
 const AuthPage: React.FC = () => {
   const [username, setUsername] = useState(""); // New field
@@ -16,7 +17,7 @@ const AuthPage: React.FC = () => {
       : { username, email, password } // Register: include username
 
     try {
-      const res = await fetch(`http://localhost:4000/auth/${endpoint}`, {
+      const res = await fetch(`${API_URL}/auth/${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),

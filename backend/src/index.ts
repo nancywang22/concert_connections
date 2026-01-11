@@ -23,7 +23,7 @@ app.use("/artists", artistRoutes);
 app.use("/concerts", concertRoutes);
 app.use("/auth", authRoutes);
 app.use("/posts", postRoutes);
-app.use("/", mainRoutes);
+app.use("", mainRoutes);
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 4000;
