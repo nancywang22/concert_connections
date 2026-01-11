@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import { formatDate } from "../utils/formatDate";
 const API_URL = "https://concert-connections.onrender.com"; // your backend
 // Type definitions for Post, Concert, and User
 interface Concert {
@@ -72,7 +72,7 @@ const MainPage: React.FC = () => {
             <div className="text-lg font-semibold">
               {post.concert.artistName}{" "}
               <span className="text-sm text-gray-500">
-                ({post.concert.city}, {post.concert.date})
+                ({post.concert.city}, {formatDate(post.concert.date)})
               </span>
             </div>
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PostForm from "../components/PostForm";
+import { formatDate } from "../utils/formatDate";
 
 const API_URL = "https://concert-connections.onrender.com";
 
@@ -141,7 +142,7 @@ const LogConcertPage: React.FC = () => {
                 className="p-2 border rounded cursor-pointer hover:bg-gray-100"
                 onClick={() => setSelectedConcert(concert)}
               >
-                {concert.eventDate} – {concert.venueName},{" "}
+                {formatDate(concert.eventDate)} – {concert.venueName},{" "}
                 {concert.cityName}
               </div>
             ))}
@@ -153,7 +154,7 @@ const LogConcertPage: React.FC = () => {
         <div className="flex items-center justify-between p-3 border rounded bg-green-50">
           <span>
             <strong>Concert:</strong>{" "}
-            {selectedConcert.eventDate} – {selectedConcert.venueName},{" "}
+            {formatDate(selectedConcert.eventDate)} – {selectedConcert.venueName},{" "}
             {selectedConcert.cityName}
           </span>
           <button
