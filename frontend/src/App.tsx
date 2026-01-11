@@ -1,33 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 import MainPage from "./pages/MainPage";
 import LogConcertPage from "./pages/LogConcertPage";
 import AuthPage from "./pages/AuthPage";
-import Navbar from "./components/Navbar";
+
 const App: React.FC = () => {
-  // Track current user
-  const [username, setUsername] = useState<string | null>(null);
-
-  // Check localStorage for JWT and username on mount
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsed = JSON.parse(storedUser);
-      setUsername(parsed.username || null);
-    }
-  }, []);
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUsername(null);
-  };
-
+  
   return (
     <Router>
-      <Navbar username={username} onLogout={handleLogout} />
       <div className="min-h-screen bg-gray-50">
         {/* Simple navigation */}
         <nav className="bg-white shadow p-4 flex gap-4">
