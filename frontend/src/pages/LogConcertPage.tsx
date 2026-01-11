@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PostForm from "../components/PostForm";
 import { formatDate } from "../utils/formatDate";
-
+import { parseConcertDate } from "../utils/formatDate";
 const API_URL = "https://concert-connections.onrender.com";
 
 // Artist and Concert interfaces
@@ -27,6 +27,8 @@ const LogConcertPage: React.FC = () => {
   const [concerts, setConcerts] = useState<Concert[]>([]);
   const [selectedConcert, setSelectedConcert] = useState<Concert | null>(null);
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   /* ---------------- Search artists ---------------- */
   const searchArtists = async () => {
     if (!query) return;
@@ -79,6 +81,19 @@ const LogConcertPage: React.FC = () => {
     setSelectedConcert(null);
   };
 
+  /* ---------------- Date filtering ---------------- */
+  const filteredConcerts = concerts.filter((concert) => {
+  const concertDate = parseConcertDate(concert.eventDate);
+
+  const start = startDate ? new Date(startDate) : null;
+  const end = endDate ? new Date(endDate) : null;
+
+  if (start && concertDate < start) return false;
+  if (end && concertDate > end) return false;
+
+  return true;
+});
+
   return (
     <div className="p-4 max-w-3xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold mb-4">Log a Concert</h1>
@@ -129,6 +144,24 @@ const LogConcertPage: React.FC = () => {
         </div>
       )}
 
+
+      {selectedArtist && concerts.length > 0 && (
+  <div className="flex gap-2 mt-4">
+    <input
+      type="date"
+      className="border p-2 rounded"
+      value={startDate}
+      onChange={(e) => setStartDate(e.target.value)}
+    />
+    <input
+      type="date"
+      className="border p-2 rounded"
+      value={endDate}
+      onChange={(e) => setEndDate(e.target.value)}
+    />
+  </div>
+)}
+
       {/* ================= CONCERT ================= */}
       {selectedArtist && !selectedConcert && concerts.length > 0 && (
         <div className="mt-4">
@@ -136,7 +169,7 @@ const LogConcertPage: React.FC = () => {
             Concerts for {selectedArtist.name}
           </h2>
           <div className="space-y-1 mt-2">
-            {concerts.map((concert) => (
+            {filteredConcerts.map((concert) => (
               <div
                 key={concert.id}
                 className="p-2 border rounded cursor-pointer hover:bg-gray-100"
