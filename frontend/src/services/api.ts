@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:4000"; // your backend
+//const API_URL = "http://localhost:4000"; // your backend
+const API_URL = "https://concert-connections.onrender.com"; // your backend
 
 export async function fetchMainPage(concertId?: string) {
   const url = concertId ? `${API_URL}/main?concertId=${concertId}` : `${API_URL}/main`;

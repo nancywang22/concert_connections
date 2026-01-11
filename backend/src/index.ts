@@ -14,14 +14,16 @@ import { connectDB } from "./db";
 connectDB();
 
 const app = express();
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+//app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "https://concert-connections.vercel.app", credentials: true }));
+
 app.use(express.json());
 
 app.use("/artists", artistRoutes);
 app.use("/concerts", concertRoutes);
 app.use("/auth", authRoutes);
 app.use("/posts", postRoutes);
-app.use("/main", mainRoutes);
+app.use("/", mainRoutes);
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 4000;
