@@ -10,7 +10,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         {/* Simple navigation */}
         <nav className="bg-white shadow p-4 flex gap-4">
-          <Link to="/main" className="text-blue-500 font-semibold">Home</Link>
+          <Link to="/" className="text-blue-500 font-semibold">Home</Link>
           <Link to="/log" className="text-blue-500 font-semibold">Concerts</Link>
           <Link to="/auth" className="text-blue-500 font-semibold">Login</Link>
         </nav>
@@ -18,7 +18,8 @@ const App: React.FC = () => {
         {/* Page content */}
         <main className="p-4">
           <Routes>
-            <Route path="/main" element={<MainPage />} />
+            
+            <Route path="/" element={<MainPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/log" element={<LogConcertPage />} />
           </Routes>
