@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+const API_URL = "https://concert-connections.onrender.com"; // your backend
 
 interface Artist {
   _id: string;
@@ -21,7 +22,7 @@ const ArtistSearch: React.FC<ArtistSearchProps> = ({ artists, setArtists, onSele
   const searchArtists = async () => {
     if (!query) return;
     try {
-      const res = await fetch(`http://localhost:4000/artists/search?q=${query}`);
+      const res = await fetch(`${API_URL}/artists/search?q=${query}`);
       const data = await res.json();
       setArtists(data); // set artists to display
     } catch (err) {

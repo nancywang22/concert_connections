@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+const API_URL = "https://concert-connections.onrender.com"; // your backend
 
 // Props for selected concert
 interface Concert {
@@ -47,7 +48,7 @@ const PostForm: React.FC<PostFormProps> = ({ selectedConcert, artistName }: Post
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/concerts/log", {
+      const res = await fetch(`${API_URL}/concerts/log`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
