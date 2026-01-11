@@ -1,17 +1,13 @@
 import { Router } from "express";
-import {
-  logConcertHandler,
-  getUserConcertsHandler,
-} from "../controllers/concertController";
-import { getConcertsForArtistHandler } from "../controllers/concertController";
-import { searchConcertsHandler } from "../controllers/concertController";
-
+import { concertsByArtistHandler, logConcertHandler } from "../controllers/concertController";
 import { requireAuth } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.post("/", requireAuth, logConcertHandler);
-router.get("/my", requireAuth, getUserConcertsHandler);
-router.get("/artist/:setlistFmId", getConcertsForArtistHandler);
-router.get("/search", searchConcertsHandler);
+// GET /concerts/:id/concerts -> fetch concerts from Setlist.fm
+router.get("/:id/concerts", concertsByArtistHandler);
+
+// POST /concerts/log -> log concert & post
+router.post("/log", requireAuth, logConcertHandler);
+
 export default router;

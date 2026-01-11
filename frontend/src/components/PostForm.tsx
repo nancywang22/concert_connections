@@ -1,64 +1,113 @@
 import React, { useState } from "react";
 
+// Props for selected concert
 interface Concert {
-  _id: string;
-  name: string;
-  date: string;
+  id: string; // Setlist.fm concert ID
+  eventDate: string;
+  venueName: string;
+  cityName: string;
 }
 
-interface Props {
+interface PostFormProps {
   selectedConcert: Concert;
 }
 
-const PostForm: React.FC<Props> = ({ selectedConcert }) => {
+const PostForm: React.FC<PostFormProps> = ({ selectedConcert }) => {
+  // ------------------------
+  // Local state
+  // ------------------------
   const [caption, setCaption] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
+  // ------------------------
+  // Handle form submission
+  // ------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!image) return alert("Please select an image");
+    setError(null);
+    setSuccess(false);
 
-    const formData = new FormData();
-    formData.append("concertId", selectedConcert._id);
-    formData.append("caption", caption);
-    formData.append("image", image);
+    const token = localStorage.getItem("token"); // JWT from login
+    if (!token) {
+      setError("You must be logged in to post.");
+      return;
+    }
+
+    // Must include caption or image
+    if (!caption && !imageUrl) {
+      setError("Please add a caption or image URL.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("http://localhost:4000/posts", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // JWT header
         },
-        body: formData,
+        body: JSON.stringify({
+          concertId: selectedConcert.id, // link post to concert
+          caption,
+          imageUrl,
+        }),
       });
 
-      if (!res.ok) throw new Error("Failed to submit post");
+      const data = await res.json();
 
-      alert("Post created!");
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create post");
+      }
+
+      // Success!
+      setSuccess(true);
       setCaption("");
-      setImage(null);
-    } catch (err) {
-      console.error(err);
-      alert("Error creating post");
+      setImageUrl("");
+    } catch (err: any) {
+      console.error("Post submission error:", err);
+      setError(err.message || "Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border p-4 rounded space-y-4">
-      <h2 className="font-semibold text-lg">Add Your Post</h2>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => e.target.files && setImage(e.target.files[0])}
-      />
-      <textarea
-        className="border p-2 w-full rounded"
-        placeholder="Caption"
-        value={caption}
-        onChange={(e) => setCaption(e.target.value)}
-      />
-      <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-        Submit
+    <form onSubmit={handleSubmit} className="space-y-3 border p-4 rounded bg-white shadow">
+      {error && <p className="text-red-600">{error}</p>}
+      {success && <p className="text-green-600">Post created successfully!</p>}
+
+      <div>
+        <label className="block font-semibold mb-1">Caption</label>
+        <textarea
+          className="border p-2 w-full rounded"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          placeholder="Write something about this concert..."
+        />
+      </div>
+
+      <div>
+        <label className="block font-semibold mb-1">Image URL</label>
+        <input
+          type="text"
+          className="border p-2 w-full rounded"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          placeholder="Optional image URL"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        {loading ? "Posting..." : "Post"}
       </button>
     </form>
   );

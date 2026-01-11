@@ -2,27 +2,34 @@ import { Request, Response } from "express";
 import Post from "../models/Post";
 import { AuthRequest } from "../middleware/authMiddleware";
 
-// Create a post
+/**
+ * Create a post for a selected concert.
+ * Route: POST /posts
+ */
 export async function createPostHandler(req: AuthRequest, res: Response) {
-  const { concertId, imageUrl, caption } = req.body;
-
-  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
-  if (!concertId || !imageUrl || !caption)
-    return res.status(400).json({ error: "concertId, imageUrl, caption required" });
-
   try {
+    const { concertId, caption, imageUrl } = req.body;
+
+    if (!req.userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    if (!concertId || (!caption && !imageUrl)) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
     const post = new Post({
-      user: req.userId,
       concert: concertId,
-      imageUrl,
       caption,
+      imageUrl,
+      user: req.userId,
     });
 
     await post.save();
     res.json(post);
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: "Failed to create post" });
+    res.status(500).json({ error: err.message });
   }
 }
 

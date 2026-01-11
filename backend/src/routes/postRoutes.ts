@@ -13,7 +13,5 @@ router.get("/", getAllPostsHandler);
 // Posts for a specific concert
 router.get("/:concertId", getPostsForConcertHandler);
 
-// Later:
-// router.post("/", requireAuth, createPostHandler);
 
 export default router;

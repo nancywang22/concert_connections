@@ -1,43 +1,47 @@
 import fetch from "node-fetch";
 
 const SETLISTFM_API_KEY = process.env.SETLISTFM_API_KEY;
-const BASE_URL = "https://api.setlist.fm/rest/1.0";
 
-if (!SETLISTFM_API_KEY) {
-  throw new Error("SETLISTFM_API_KEY not set in .env");
-}
-
+// ---------------------------
 // Search artists by name
+// ---------------------------
 export async function searchArtists(query: string) {
-  const response = await fetch(`${BASE_URL}/search/artists?artistName=${encodeURIComponent(query)}`, {
+  const url = `https://api.setlist.fm/rest/1.0/search/artists?artistName=${encodeURIComponent(query)}&p=1`;
+
+  const res = await fetch(url, {
     headers: {
-      "x-api-key": SETLISTFM_API_KEY!,
+      "x-api-key": SETLISTFM_API_KEY || "",
       Accept: "application/json",
     },
   });
 
-  const data = await response.json();
-  // Return simplified list
-  return data.artist || [];
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Setlist.fm API error: ${res.status} - ${text}`);
+  }
+
+  const data = await res.json();
+  return data.artist || []; // returns array of artists
 }
 
-// Get concerts (setlists) for an artist by Setlist.fm ID
-export async function getConcertsForArtist(setlistFmId: string) {
-  const response = await fetch(`${BASE_URL}/artist/${setlistFmId}/setlists`, {
+// ---------------------------
+// Get concerts (setlists) by artist mbid
+// ---------------------------
+export async function getConcertsByArtist(setlistFmId: string) {
+  const url = `https://api.setlist.fm/rest/1.0/artist/${setlistFmId}/setlists?p=1`;
+
+  const res = await fetch(url, {
     headers: {
-      "x-api-key": SETLISTFM_API_KEY!,
+      "x-api-key": SETLISTFM_API_KEY || "",
       Accept: "application/json",
     },
   });
 
-  const data = await response.json();
-  return data.setlist || [];
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Setlist.fm API error: ${res.status} - ${text}`);
+  }
+
+  const data = await res.json();
+  return data.setlist || []; // returns array of setlists
 }
-
-
-
-/*Fetches artist data
-
-Throws error if API fails
-
-Returns array of artist objects*/

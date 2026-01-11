@@ -1,6 +1,6 @@
 import { Response } from "express";
 import User from "../models/User";
-import Concert from "../models/Concert";
+import {Concert} from "../models/Concert";
 import Post from "../models/Post";
 import { AuthRequest } from "../middleware/authMiddleware"; // use your typed request
 

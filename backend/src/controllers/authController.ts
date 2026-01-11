@@ -39,7 +39,7 @@ export async function loginHandler(req: Request, res: Response) {
 
   
   console.log("User found:", user);
-    console.log("Password hash:", user?.passwordHash);
+console.log("Password hash:", user?.passwordHash);
 
 
   res.json({ token, user: { id: user._id, username: user.username, email } });
