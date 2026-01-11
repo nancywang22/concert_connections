@@ -20,6 +20,7 @@ const App: React.FC = () => {
         {/* Page content */}
         <main className="p-4">
           <Routes>
+
             <Route path="/" element={<MainPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/log" element={<LogConcertPage />} />
