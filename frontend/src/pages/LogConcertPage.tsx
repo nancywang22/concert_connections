@@ -47,6 +47,7 @@ const LogConcertPage: React.FC = () => {
     setSelectedArtist(artist);
     setArtists([]);
     setQuery("");
+    setSelectedConcert(null);
 
     try {
       const res = await fetch(`${API_URL}/artists/${artist._id}/concerts`);
@@ -63,6 +64,18 @@ const LogConcertPage: React.FC = () => {
     } catch (err) {
       console.error("Fetching concerts error:", err);
     }
+  };
+
+  /* ---------------- Change handlers ---------------- */
+  const changeArtist = () => {
+    setSelectedArtist(null);
+    setSelectedConcert(null);
+    setConcerts([]);
+    setArtists([]);
+  };
+
+  const changeConcert = () => {
+    setSelectedConcert(null);
   };
 
   return (
@@ -102,8 +115,16 @@ const LogConcertPage: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="p-3 border rounded bg-blue-50">
-          <strong>Artist:</strong> {selectedArtist.name}
+        <div className="flex items-center justify-between p-3 border rounded bg-blue-50">
+          <span>
+            <strong>Artist:</strong> {selectedArtist.name}
+          </span>
+          <button
+            onClick={changeArtist}
+            className="text-sm text-blue-600 underline"
+          >
+            Change
+          </button>
         </div>
       )}
 
@@ -120,7 +141,7 @@ const LogConcertPage: React.FC = () => {
                 className="p-2 border rounded cursor-pointer hover:bg-gray-100"
                 onClick={() => setSelectedConcert(concert)}
               >
-                {concert.eventDate} - {concert.venueName},{" "}
+                {concert.eventDate} – {concert.venueName},{" "}
                 {concert.cityName}
               </div>
             ))}
@@ -129,10 +150,18 @@ const LogConcertPage: React.FC = () => {
       )}
 
       {selectedConcert && (
-        <div className="p-3 border rounded bg-green-50">
-          <strong>Concert:</strong>{" "}
-          {selectedConcert.eventDate} – {selectedConcert.venueName},{" "}
-          {selectedConcert.cityName}
+        <div className="flex items-center justify-between p-3 border rounded bg-green-50">
+          <span>
+            <strong>Concert:</strong>{" "}
+            {selectedConcert.eventDate} – {selectedConcert.venueName},{" "}
+            {selectedConcert.cityName}
+          </span>
+          <button
+            onClick={changeConcert}
+            className="text-sm text-green-700 underline"
+          >
+            Change
+          </button>
         </div>
       )}
 
