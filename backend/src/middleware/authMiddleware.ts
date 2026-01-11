@@ -9,14 +9,21 @@ export interface AuthRequest extends Request {
 
 export function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: "Missing token" });
+
+  if (!authHeader) {
+    return res.status(401).json({ error: "No token provided" });
+  }
 
   const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "Invalid token format" });
+  }
+
   try {
-    const payload: any = jwt.verify(token, JWT_SECRET);
-    req.userId = payload.id;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    req.userId = decoded.id;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: "Invalid token" });
   }
 }

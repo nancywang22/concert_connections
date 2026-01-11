@@ -2,7 +2,8 @@ import React, { useState } from "react";
 
 // Props for selected concert
 interface Concert {
-  id: string; // Setlist.fm concert ID
+  //id: string; // Setlist.fm concert ID
+  artistName: string;
   eventDate: string;
   venueName: string;
   cityName: string;
@@ -10,9 +11,10 @@ interface Concert {
 
 interface PostFormProps {
   selectedConcert: Concert;
+  artistName:string;
 }
 
-const PostForm: React.FC<PostFormProps> = ({ selectedConcert }) => {
+const PostForm: React.FC<PostFormProps> = ({ selectedConcert, artistName }: PostFormProps) => {
   // ------------------------
   // Local state
   // ------------------------
@@ -45,18 +47,21 @@ const PostForm: React.FC<PostFormProps> = ({ selectedConcert }) => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // JWT header
-        },
-        body: JSON.stringify({
-          concertId: selectedConcert.id, // link post to concert
-          caption,
-          imageUrl,
-        }),
-      });
+      const res = await fetch("http://localhost:4000/concerts/log", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+  body: JSON.stringify({
+    artistName,
+    city: selectedConcert.cityName,
+    date: selectedConcert.eventDate,
+    venue: selectedConcert.venueName,
+    caption,
+    imageUrl,
+  }),
+});
 
       const data = await res.json();
 

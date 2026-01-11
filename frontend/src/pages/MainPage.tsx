@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 // Type definitions for Post, Concert, and User
 interface Concert {
   _id: string;
-  name: string;
+  artistName: string;
   date: string;
   city: string;
 }
@@ -69,7 +69,7 @@ const MainPage: React.FC = () => {
           >
             {/* Concert Info */}
             <div className="text-lg font-semibold">
-              {post.concert.name}{" "}
+              {post.concert.artistName}{" "}
               <span className="text-sm text-gray-500">
                 ({post.concert.city}, {post.concert.date})
               </span>
@@ -89,7 +89,7 @@ const MainPage: React.FC = () => {
 
             {/* User Info */}
             <p className="text-sm text-gray-500 mt-1">
-              by {post.user.username} ({post.user.email})
+              by {post.user.username}
             </p>
           </div>
         ))

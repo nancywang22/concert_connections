@@ -10,6 +10,7 @@ interface Artist {
 
 interface Concert {
   id: string; // Setlist.fm ID
+  artistName: string;
   eventDate: string;
   venueName: string;
   cityName: string;
@@ -126,10 +127,10 @@ const LogConcertPage: React.FC = () => {
       {/* ------------------------ */}
       {/* Post form for selected concert */}
       {/* ------------------------ */}
-      {selectedConcert && (
+      {selectedConcert && selectedArtist && (
         <div className="mt-4">
           <h2 className="font-semibold text-lg">Create Post for {selectedConcert.venueName}</h2>
-          <PostForm selectedConcert={selectedConcert} />
+          <PostForm selectedConcert={selectedConcert} artistName={selectedArtist.name} />
         </div>
       )}
     </div>

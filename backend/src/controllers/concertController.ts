@@ -1,58 +1,55 @@
-import { Request, Response } from "express";
-import { Concert } from "../models/Concert";
-import  Post from "../models/Post";
-import { getConcertsByArtist } from "../services/setlistfmService";
+import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
+import { Concert } from "../models/Concert";
+import { Post } from "../models/Post";
 
-// GET concerts from Setlist.fm for a selected artist
-export async function concertsByArtistHandler(req: Request, res: Response) {
-  const { id: setlistFmId } = req.params; // Setlist.fm artist ID
-  if (!setlistFmId) return res.status(400).json({ error: "Artist ID required" });
-
-  try {
-    const concerts = await getConcertsByArtist(setlistFmId);
-    res.json(concerts);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch concerts", details: err.message });
-  }
-}
-
-// POST: Log a concert and create a post
 export async function logConcertHandler(req: AuthRequest, res: Response) {
   try {
-    const { artistName, concertName, city, date, venue, setlistFmId, imageUrl, caption } = req.body;
-    const userId = req.userId;
+    console.log("LOG CONCERT BODY:", req.body);
 
-    if (!artistName || !concertName || !city || !date || !userId) {
-      return res.status(400).json({ error: "artistName, concertName, city, date, and userId are required" });
+    const { artistName, city, date, venue, caption, imageUrl } = req.body;
+
+    if (!artistName || !city || !date) {
+      return res.status(400).json({
+        error: "artistName, city, and date are required",
+      });
     }
 
-    // Create or reuse a concert document
+    if (!req.userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // 1️⃣ Save concert
     const concert = new Concert({
       artistName,
-      concertName,
       city,
       date,
       venue,
-      ...(setlistFmId ? { setlistFmId } : {}),
+      user: req.userId,
     });
 
+    console.log("About to save concert...");
     await concert.save();
+    console.log("Concert saved:", concert._id);
 
-    // Create the post linked to this concert
+    // 2️⃣ Save post
+    console.log("About to save post...");
     const post = new Post({
-      user: userId,
+      user: req.userId,
       concert: concert._id,
       caption,
       imageUrl,
     });
 
     await post.save();
+    console.log("Post saved:", post._id);
 
-    res.json({ message: "Concert logged successfully", concert, post });
+    return res.status(201).json({ concert, post });
   } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to log concert", details: err.message });
+    console.error("POST CREATION FAILED:", err);
+    return res.status(500).json({
+      error: "Failed to log concert",
+      details: err.message,
+    });
   }
 }

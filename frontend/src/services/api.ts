@@ -23,6 +23,7 @@ export async function logPost(concertId: string, imageUrl: string, caption: stri
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    //body: JSON.stringify(FormData),
     body: JSON.stringify({ concertId, imageUrl, caption }),
   });
   return res.json();

@@ -1,14 +1,26 @@
-// models/Concert.ts
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const ConcertSchema = new mongoose.Schema({
-  artistName: { type: String, required: true },
-  concertName: { type: String },
-  city: { type: String, required: true },
-  venue: { type: String },
-  date: { type: String, required: true },
+export interface IConcert extends Document {
+  artistName: string;
+  city: string;
+  date: string;
+  venue?: string;
+  user: mongoose.Types.ObjectId;
+}
 
-  attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-});
+const ConcertSchema = new Schema<IConcert>(
+  {
+    artistName: { type: String, required: true },
+    city: { type: String, required: true },
+    date: { type: String, required: true },
+    venue: { type: String },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-export const Concert = mongoose.model("Concert", ConcertSchema);
+export const Concert = mongoose.model<IConcert>("Concert", ConcertSchema);
