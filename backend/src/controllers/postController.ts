@@ -35,8 +35,9 @@ export async function createPostHandler(req: AuthRequest, res: Response) {
     });
 
     // Persist the post to the database
+    console.log("Saving post");
     await post.save();
-
+    console.log("Post saved!");
     // Return the newly created post
     res.json(post);
   } catch (err: any) {
