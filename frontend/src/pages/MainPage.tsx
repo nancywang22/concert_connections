@@ -63,6 +63,7 @@ const MainPage: React.FC = () => {
       ) : posts.length === 0 ? (
         <p>No posts yet. Log a concert to get started!</p>
       ) : (
+        // Render each post
         posts.map((post) => (
           <div
             key={post._id}
